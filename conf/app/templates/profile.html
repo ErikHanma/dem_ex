@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class='row justify-content-center'><div class='col-md-6'>
+  <h4>Мой профиль</h4>
+  <form method='post' enctype='multipart/form-data'>{% csrf_token %}
+    <input name='first_name' value='{{ user.first_name }}' class='form-control mb-2' placeholder='Имя'>
+    <input name='last_name' value='{{ user.last_name }}' class='form-control mb-2' placeholder='Фамилия'>
+    <input name='patronymic' value='{{ user.patronymic }}' class='form-control mb-2' placeholder='Отчество'>
+    <input name='phone' value='{{ user.phone }}' class='form-control mb-2' placeholder='Телефон'>
+    <input name='email' value='{{ user.email }}' class='form-control mb-2' placeholder='Email'>
+    <button class='btn btn-dark w-100'>Сохранить</button>
+  </form>
+
+  <a href='{% url "my_bookings" %}'></a>
+</div></div>
+
+
+<h4>Мои бронирования</h4>
+<table class='table table-bordered bg-white'>
+  <thead class='table-dark'><tr><th>Помещение</th><th>Дата</th><th>Время</th><th>Оплата</th><th>Статус</th><th>Действие</th></tr></thead>
+  <tbody>
+    {% for b in bookings %}
+    <tr>
+      <td>{{ b.room.name }}</td>
+      <td>{{ b.date }}</td>
+      <td>{{ b.time }}</td>
+      <td>{{ b.payment }}</td>
+      <td><span class='badge bg-info'>{{ b.status.name }}</span></td>
+      <td>
+        {% if b.can_cancel %}<a href='{% url "cancel_booking" b.pk %}' class='btn btn-sm btn-danger' onclick='return confirm("Отменить?")'>Отменить</a>{% endif %}
+        {% if b.status.name == 'Завершена' %}
+          <form method='post' action='{% url "add_review" b.pk %}'>{% csrf_token %}
+            <input name='review' placeholder='Оставить отзыв' class='form-control mb-1' required>
+            <button class='btn btn-sm btn-success'>Отзыв</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan='6' class='text-center text-muted'>Нет бронирований</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% endblock %}

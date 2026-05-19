@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Страница и форма входа (логина) -->
+<div class='row justify-content-center'><div class='col-md-4'>
+  <h4>Вход</h4>
+  {% if error %}<div class='alert alert-danger'>{{ error }}</div>{% endif %}
+  <form method='post'>{% csrf_token %}
+    <input name='username' class='form-control mb-2' placeholder='Логин' required>
+    <input name='password' type='password' class='form-control mb-2' placeholder='Пароль' required>
+    <button class='btn btn-dark w-100'>Войти</button>
+  </form>
+  <p class='mt-2 text-center'><a href='{% url "register" %}'>Ещё не зарегистрированы? Регистрация</a></p>
+</div></div>
+{% endblock %}

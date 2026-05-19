@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Страница и форма регистрации -->
+<div class='row justify-content-center'><div class='col-md-5'>
+  <h4>Регистрация</h4>
+  {% if error %}<div class='alert alert-danger'>{{ error }}</div>{% endif %}
+  <form method='post' enctype='multipart/form-data'>{% csrf_token %}
+    <input name='username' class='form-control mb-2' placeholder='Логин' required>
+    <input name='password' type='password' class='form-control mb-2' placeholder='Пароль' required>
+    <input name='first_name' class='form-control mb-2' placeholder='Имя'>
+    <input name='last_name' class='form-control mb-2' placeholder='Фамилия'>
+    <input name='patronymic' class='form-control mb-2' placeholder='Отчество'>
+    <input name='phone' class='form-control mb-2' placeholder='Телефон 8(XXX)XXX-XX-XX'>
+    <input name='email' type='email' class='form-control mb-2' placeholder='Email'>
+    <button class='btn btn-dark w-100 mb-2'>Зарегистрироваться</button>
+  </form>
+  <p class='text-center'><a href='{% url "login" %}'>Уже есть аккаунт? Вход</a></p>
+</div></div>
+{% endblock %}

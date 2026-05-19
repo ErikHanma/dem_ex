@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if carousel_images %}
+<div id='carousel' class='carousel slide mb-4' data-bs-ride='carousel' data-bs-interval='3000'>
+  <div class='carousel-inner rounded' style='max-height:320px;overflow:hidden'>
+    {% for img in carousel_images %}
+    <div class='carousel-room {% if forloop.first %}active{% endif %}'>
+      <img src='{{ img }}' class='d-block w-100' style='height:320px;object-fit:cover'>
+    </div>
+    {% endfor %}
+  </div>
+  <button class='carousel-control-prev' data-bs-target='#carousel' data-bs-slide='prev'><span class='carousel-control-prev-icon'></span></button>
+  <button class='carousel-control-next' data-bs-target='#carousel' data-bs-slide='next'><span class='carousel-control-next-icon'></span></button>
+</div>
+{% endif %}
+<h5 class='mb-3'>Доступные помещения</h5>
+<form method='get' class='d-flex gap-2 mb-3 flex-wrap'>
+  <input name='q' value='{{ q }}' class='form-control w-auto' placeholder='Поиск'>
+  <select name='sort' class='form-select w-auto' onchange='this.form.submit()'>
+    <option value='id' {% if sort == 'id' %}selected{% endif %}>По умолчанию</option>
+    <option value='name' {% if sort == 'name' %}selected{% endif %}>По названию</option>
+    <option value='capacity' {% if sort == 'capacity' %}selected{% endif %}>Вместимость ↑</option>
+    <option value='-capacity' {% if sort == '-capacity' %}selected{% endif %}>Вместимость ↓</option>
+  </select>
+  <button class='btn btn-dark'>Найти</button>
+  {% if q %}<a href='{% url "rooms" %}' class='btn btn-outline-secondary'>Сбросить</a>{% endif %}
+</form>
+<div class='row row-cols-1 row-cols-md-3 g-4 mb-4'>
+  {% for room in rooms %}
+  <div class='col'><div class='card h-100'>
+    {% if room.image %}<img src='{{ room.image.url }}' class='card-img-top' style='height:180px;object-fit:cover'>
+    {% else %}<div class='bg-secondary text-white text-center py-5'>Нет фото</div>{% endif %}
+    <div class='card-body'>
+      <h6><a href='{% url "detail" room.pk %}' class='text-decoration-none text-dark'>{{ room.name }}</a></h6>
+      <p class='text-muted small mb-1'>{{ room.category }}</p>
+      <p class='mb-1'>Вместимость: {{ room.capacity }} чел.</p>
+      {% if room.is_active %}<span class='badge bg-success'>Доступно</span>{% else %}<span class='badge bg-secondary'>Недоступно</span>{% endif %}
+    </div>
+    <div class='card-footer d-flex gap-2'>
+      {% if user.is_authenticated and room.is_active %}<a href='{% url "book" room.pk %}' class='btn btn-sm btn-dark'>Забронировать</a>{% endif %}
+      {% if user.is_staff %}<a href='{% url "delete_item" room.pk %}' class='btn btn-sm btn-outline-danger' onclick='return confirm("Удалить?")'>Удалить</a>{% endif %}
+    </div>
+  </div></div>
+  {% empty %}<div class='col'><p class='text-muted'>Ничего не найдено</p></div>
+  {% endfor %}
+</div>
+{% if rooms.has_other_pages %}
+<nav><ul class='pagination'>
+  {% if rooms.has_previous %}<li class='page-room'><a class='page-link' href='?page={{ rooms.previous_page_number }}&q={{ q }}'>❮</a></li>{% endif %}
+  {% for n in rooms.paginator.page_range %}<li class='page-room {% if n == rooms.number %}active{% endif %}'><a class='page-link' href='?page={{ n }}&q={{ q }}'>{{ n }}</a></li>{% endfor %}
+  {% if rooms.has_next %}<li class='page-room'><a class='page-link' href='?page={{ rooms.next_page_number }}&q={{ q }}'>❯</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

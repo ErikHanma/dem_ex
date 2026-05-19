@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Мои бронирования</h4>
+<table class='table table-bordered bg-white'>
+  <thead class='table-dark'><tr><th>Помещение</th><th>Дата</th><th>Время</th><th>Оплата</th><th>Статус</th><th>Действие</th></tr></thead>
+  <tbody>
+    {% for b in bookings %}
+    <tr>
+      <td>{{ b.room.name }}</td>
+      <td>{{ b.date }}</td>
+      <td>{{ b.time }}</td>
+      <td>{{ b.payment }}</td>
+      <td><span class='badge bg-info'>{{ b.status.name }}</span></td>
+      <td>
+        {% if b.can_cancel %}<a href='{% url "cancel_booking" b.pk %}' class='btn btn-sm btn-danger' onclick='return confirm("Отменить?")'>Отменить</a>{% endif %}
+        {% if b.status.name == 'Завершена' %}
+          <form method='post' action='{% url "add_review" b.pk %}'>{% csrf_token %}
+            <input name='review' placeholder='Оставить отзыв' class='form-control mb-1' required>
+            <button class='btn btn-sm btn-success'>Отзыв</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan='6' class='text-center text-muted'>Нет бронирований</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
